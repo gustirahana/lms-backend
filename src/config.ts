@@ -1,5 +1,6 @@
 export interface AppConfig {
   port: number;
+  host: string;
   frontendOrigins: string[];
   trustProxyHops: number;
   bodyLimit: string;
@@ -154,6 +155,7 @@ export function loadConfig(env: NodeJS.ProcessEnv): AppConfig {
 
   return {
     port: integerValue(env, 'PORT', 4000, 1, 65535),
+    host: env.HOST || '0.0.0.0',
     frontendOrigins,
     trustProxyHops: integerValue(env, 'TRUST_PROXY_HOPS', 0, 0, 10),
     bodyLimit,

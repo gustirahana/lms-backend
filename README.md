@@ -47,7 +47,7 @@ The connected project currently has the baseline LMS schema and both follow-up i
 npm run start:dev
 ```
 
-The API listens on `http://localhost:4000/api`. Liveness is `/api/health`; readiness is `/api/health/ready`. The API exits in production when Supabase configuration or schema version 1 is missing.
+The API listens on `http://localhost:4000/api` by default. Set `HOST=127.0.0.1` for a local-only listener; container deployments commonly use `HOST=0.0.0.0` behind their ingress or reverse proxy. Liveness is `/api/health`; readiness is `/api/health/ready`. The API exits in production when Supabase configuration or schema version 1 is missing.
 
 The API sends Supabase publishable/secret keys only in the `apikey` header. It does not use a project API key as a bearer token. Authenticated `/user` and `/logout` calls send the user's Supabase access token as `Authorization: Bearer ...`.
 
