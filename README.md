@@ -98,6 +98,8 @@ The hosted `lms-backend` Supabase project was `ACTIVE_HEALTHY` with three migrat
 
 The compiled API was started in production mode on loopback with the ignored backend `.env` and a temporary HTTPS origin. `/api/health/ready` returned 200 against the hosted schema; public `GET /api/courses` returned 200, and `GET /api/dashboard` returned 401 without a session. Both Socket.IO namespaces rejected connections without a session cookie. The verified production config and HTTP checks used a temporary origin, not a deployed frontend domain.
 
+Hosted Auth rejection checks returned 401 for session restore and refresh without a cookie. One login attempt for an unregistered synthetic address returned a generic 401 and did not set a session cookie; this did not create or modify a user.
+
 This snapshot does not verify a valid hosted user login, refresh/logout with real credentials, browser cookie behavior on a deployment domain, or authorized Socket.IO room access against hosted memberships. Those remain release checks.
 
 An Auth user insert trigger creates a learner profile. It ignores any role in user metadata. Promote instructors/admins and assign courses using privileged Supabase SQL or a future audited admin API. For example, after creating an Auth user, an operator can update `profiles.role`, create a `courses` row, and insert matching `course_instructors` or `course_enrollments` rows in the Supabase SQL editor. Course room access is checked against owner, instructor assignment, or active/completed enrollment on every join and message send.
