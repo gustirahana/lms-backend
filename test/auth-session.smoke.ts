@@ -57,7 +57,7 @@ async function run(): Promise<void> {
       const token = authorization.slice('Bearer '.length);
       if (token === accessToken) return Response.json(authUser);
       if (token === rotatedAccessToken) return Response.json(rotatedTokenUser);
-      return new Response(null, { status: 401 });
+      return Response.json({ code: 403, msg: 'invalid JWT: token is malformed' }, { status: 403 });
     }
 
     if (url.includes('/auth/v1/token?grant_type=refresh_token') && method === 'POST') {
@@ -174,6 +174,9 @@ async function run(): Promise<void> {
 
     const restoredUser = await authService.getAuthenticatedUser(session.cookie);
     assert.deepEqual(restoredUser, { id: authUser.id, email: authUser.email });
+
+    const verifyAccessToken = Reflect.get(authService, 'verifyAccessToken') as (token: string) => Promise<unknown>;
+    assert.equal(await verifyAccessToken.call(authService, 'synthetic-malformed-access-token'), undefined);
 
     claimRefreshLock = false;
     await assert.rejects(authService.refresh(session.cookie), SessionRefreshInProgressException);

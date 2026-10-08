@@ -234,7 +234,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     const payload = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      if (response.status === 400 || response.status === 401) {
+      if (response.status === 400 || response.status === 401 || (path === '/user' && response.status === 403)) {
         throw new UnauthorizedException('Invalid credentials or expired session');
       }
 
