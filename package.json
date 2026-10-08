@@ -11,6 +11,7 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main.js",
     "lint": "eslint \"src/**/*.ts\"",
+    "test:config": "node -r ts-node/register test/config.smoke.ts",
     "test:startup": "node -r ts-node/register test/startup.smoke.ts",
     "test:realtime": "node -r ts-node/register test/realtime.smoke.ts",
     "test:auth-session": "node -r ts-node/register test/auth-session.smoke.ts",

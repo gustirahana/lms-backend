@@ -35,6 +35,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Production configuration smoke
+        run: npm run test:config
+
       - name: Auth session smoke
         run: npm run test:auth-session
 

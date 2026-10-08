@@ -55,7 +55,11 @@ The API sends Supabase publishable/secret keys only in the `apikey` header. It d
 
 Run `npm run test:realtime` to start the Nest application on an ephemeral local port and exercise HTTP auth and both Socket.IO namespaces with a mocked `AuthService`. The smoke checks that login returns only the user while setting an `HttpOnly; SameSite=Lax` cookie, rejects unapproved HTTP and socket origins, enforces course-room authorization, persists messages before broadcast, and disconnects both namespaces on logout. It needs no Supabase credentials or project.
 
-This verifies the local gateway and HTTP wiring only. It does not prove Supabase Auth, database RPC signatures, RLS, migration application, browser cookie behavior, or deployment configuration. Keep the real Supabase integration check as a separate deployment gate after a project is provisioned and the migration is applied.
+This verifies the local gateway and HTTP wiring with a mocked `AuthService`. It does not prove Supabase Auth, database RPC signatures, RLS, migration application, browser cookie behavior, or deployment configuration. Run `npm run test:supabase` for a provider/Postgres integration check against the local Supabase stack; that smoke does not contact the hosted project. Hosted sign-in, browser-cookie behavior, CORS, and deployed Socket.IO behavior remain separate release checks.
+
+## Production configuration smoke
+
+Run `npm run test:config` to check production HTTPS origins, required Supabase key settings, encryption key-ring format and version selection, trusted-proxy bounds, and legacy key-name fallback. It uses synthetic values and makes no network requests.
 
 ## Local auth-session smoke
 
@@ -69,7 +73,7 @@ In this environment, Docker published the local Supabase ports on all host inter
 
 ## Continuous integration
 
-The GitHub Actions workflow runs on Node 22 and performs `npm ci`, `npm audit`, build, lint, the mocked auth-session smoke, and the mocked realtime smoke. It does not start Docker or Supabase because this environment's local CLI publishes ports on wildcard host interfaces. CI therefore does not prove migration application, Supabase Auth behavior, Postgres ACL/RPC behavior, real socket delivery, or production cookie and network behavior; run `npm run test:supabase` on a trusted local network before release.
+The GitHub Actions workflow runs on Node 22 and performs `npm ci`, `npm audit`, build, startup smoke, lint, production configuration smoke, mocked auth-session smoke, and mocked realtime smoke. It does not start Docker or Supabase because this environment's local CLI publishes ports on wildcard host interfaces. CI therefore does not prove migration application, Supabase Auth behavior, Postgres ACL/RPC behavior, real socket delivery, or production cookie and network behavior; run `npm run test:supabase` on a trusted local network before release.
 
 ## Browser authentication
 
@@ -87,6 +91,14 @@ The browser receives only a random 256-bit opaque cookie (`lms_session` locally,
 ## Supabase data and provisioning
 
 The migration enables RLS on every application table, explicitly revokes table access from `public`, `anon`, and `authenticated`, and grants the server-only `service_role` access; it creates no client table policies. It also explicitly revokes default function execution and grants only the necessary RPCs to `service_role`. Keep these explicit grants and revokes in future migrations: new Supabase projects are changing default grants for public tables. The backend uses the Supabase secret key (or the legacy service-role key fallback) only on the server. Never expose that key or `AUTH_ENCRYPTION_KEYS` to the frontend.
+
+### Hosted verification snapshot (2026-10-08)
+
+The hosted `lms-backend` Supabase project was `ACTIVE_HEALTHY` with three migration versions recorded and API schema version 1. A read-only database check confirmed RLS on all 10 application tables, no `SELECT` for `anon` or `authenticated` on those tables, and server-role access. The five application functions deny execution to `anon` and `authenticated`; the service role has execution access. The Security Advisor reports 10 informational `rls_enabled_no_policy` notices, expected for the server-only table-access model with client privileges revoked.
+
+The compiled API was started in production mode on loopback with the ignored backend `.env` and a temporary HTTPS origin. `/api/health/ready` returned 200 against the hosted schema; public `GET /api/courses` returned 200, and `GET /api/dashboard` returned 401 without a session. Both Socket.IO namespaces rejected connections without a session cookie. The verified production config and HTTP checks used a temporary origin, not a deployed frontend domain.
+
+This snapshot does not verify a valid hosted user login, refresh/logout with real credentials, browser cookie behavior on a deployment domain, or authorized Socket.IO room access against hosted memberships. Those remain release checks.
 
 An Auth user insert trigger creates a learner profile. It ignores any role in user metadata. Promote instructors/admins and assign courses using privileged Supabase SQL or a future audited admin API. For example, after creating an Auth user, an operator can update `profiles.role`, create a `courses` row, and insert matching `course_instructors` or `course_enrollments` rows in the Supabase SQL editor. Course room access is checked against owner, instructor assignment, or active/completed enrollment on every join and message send.
 
