@@ -45,6 +45,8 @@ interface EnrollmentRow {
 }
 
 interface DatabaseCourse {
+  content_languages?: Array<'id' | 'en'>;
+  translations?: Partial<Record<'id' | 'en', { title: string; description: string }>>;
   id: string;
   title: string;
   instructor?: { display_name?: string } | null;
@@ -651,7 +653,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     if (courseIds.length > 0) {
       [courses, progress] = await Promise.all([
           this.databaseRequest<DatabaseCourse[]>(
-            `/courses?id=in.(${courseIds.join(',')})&status=eq.published&select=id,title,category,level,duration_minutes,lesson_count,accent,icon,description,instructor:profiles!courses_owner_id_fkey(display_name)`,
+            `/courses?id=in.(${courseIds.join(',')})&status=eq.published&select=id,title,category,level,duration_minutes,lesson_count,accent,icon,description,content_languages,translations,instructor:profiles!courses_owner_id_fkey(display_name)`,
           ),
           this.databaseRequest<ProgressRow[]>(
             `/course_progress?user_id=eq.${userId}&course_id=in.(${courseIds.join(',')})&select=course_id,progress_percent,minutes_spent`,
@@ -679,24 +681,29 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
         category: course.category,
         level: course.level,
         duration: course.duration_minutes >= 60
-          ? `${Math.round(course.duration_minutes / 60)} hours`
+          ? `${course.duration_minutes / 60} hours`
           : `${course.duration_minutes} min`,
         lessons: course.lesson_count,
         progress: progressByCourse.get(course.id)?.progress_percent || 0,
         accent: course.accent,
         icon: course.icon,
         description: course.description,
+        languages: course.content_languages || ['en'],
+        translations: course.translations || {},
       })),
     };
   }
 
-  async findPublishedCourses(query?: string) {
+  async findPublishedCourses(query?: string, language?: 'id' | 'en' | 'both') {
     const courses = await this.databaseRequest<DatabaseCourse[]>(
-      '/courses?status=eq.published&select=id,title,category,level,duration_minutes,lesson_count,accent,icon,description,instructor:profiles!courses_owner_id_fkey(display_name)&limit=100',
+      '/courses?status=eq.published&select=id,title,category,level,duration_minutes,lesson_count,accent,icon,description,content_languages,translations,instructor:profiles!courses_owner_id_fkey(display_name)&limit=100',
     );
     const normalizedQuery = query?.trim().toLowerCase();
 
     return courses
+      .filter((course) => !language || (language === 'both'
+        ? course.content_languages?.length === 2
+        : course.content_languages?.length === 1 && course.content_languages[0] === language))
       .filter((course) => !normalizedQuery ||
         `${course.title} ${course.category} ${course.instructor?.display_name || ''}`.toLowerCase().includes(normalizedQuery))
       .map((course) => ({
@@ -706,13 +713,15 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
         category: course.category,
         level: course.level,
         duration: course.duration_minutes >= 60
-          ? `${Math.round(course.duration_minutes / 60)} hours`
+          ? `${course.duration_minutes / 60} hours`
           : `${course.duration_minutes} min`,
         lessons: course.lesson_count,
         progress: 0,
         accent: course.accent,
         icon: course.icon,
         description: course.description,
+        languages: course.content_languages || ['en'],
+        translations: course.translations || {},
       }));
   }
 }

@@ -5,7 +5,7 @@ import { AuthService } from '../auth/auth.service';
 export class CoursesService {
   constructor(private readonly authService: AuthService) {}
 
-  findAll(query?: string) {
-    return this.authService.findPublishedCourses(query);
+  findAll(query?: string, language?: 'id' | 'en' | 'both') {
+    return this.authService.findPublishedCourses(query, language);
   }
 }

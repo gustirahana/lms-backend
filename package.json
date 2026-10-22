@@ -18,7 +18,8 @@
     "test:supabase": "node -r ts-node/register test/supabase.integration.ts",
     "db:start": "(docker network inspect jakija-supabase-local >/dev/null 2>&1 || docker network create --driver bridge --opt com.docker.network.bridge.host_binding_ipv4=127.0.0.1 jakija-supabase-local) && supabase start --network-id jakija-supabase-local",
     "db:stop": "supabase stop",
-    "db:reset": "supabase db reset"
+    "db:reset": "supabase db reset",
+    "test:course-languages": "node -r ts-node/register test/course-languages.smoke.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.0",

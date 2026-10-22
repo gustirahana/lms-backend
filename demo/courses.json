@@ -1,0 +1,185 @@
+[
+  {
+    "id": "7b810001-0000-4000-8000-000000000001",
+    "title": "Interfaces that make sense",
+    "description": "A sample learning path through hierarchy, typography, and accessible interface patterns.",
+    "category": "Design",
+    "level": "beginner",
+    "durationMinutes": 180,
+    "lessons": 12,
+    "accent": "lavender",
+    "icon": "Aa",
+    "languages": [
+      "id",
+      "en"
+    ],
+    "translations": {
+      "en": {
+        "title": "Interfaces that make sense",
+        "description": "A sample learning path through hierarchy, typography, and accessible interface patterns."
+      },
+      "id": {
+        "title": "Antarmuka yang Mudah Dipahami",
+        "description": "Contoh alur belajar tentang hierarki, tipografi, dan pola antarmuka yang aksesibel."
+      }
+    },
+    "progress": 42,
+    "minutesSpent": 75
+  },
+  {
+    "id": "7b810001-0000-4000-8000-000000000002",
+    "title": "Build your first React workspace",
+    "description": "A sample course on components, application state, and connecting a learner interface to an API.",
+    "category": "Development",
+    "level": "intermediate",
+    "durationMinutes": 300,
+    "lessons": 18,
+    "accent": "peach",
+    "icon": "</>",
+    "languages": [
+      "en"
+    ],
+    "translations": {},
+    "progress": 18,
+    "minutesSpent": 54
+  },
+  {
+    "id": "7b810001-0000-4000-8000-000000000003",
+    "title": "Mengenal API dengan NestJS",
+    "description": "Pelajari contoh kontrak API, sesi cookie, dan pembatasan akses melalui proyek NestJS.",
+    "category": "Backend",
+    "level": "beginner",
+    "durationMinutes": 120,
+    "lessons": 8,
+    "accent": "mint",
+    "icon": "{ }",
+    "languages": [
+      "id"
+    ],
+    "translations": {},
+    "progress": 0,
+    "minutesSpent": 0
+  },
+  {
+    "id": "7b810001-0000-4000-8000-000000000004",
+    "title": "Dasar Tipografi untuk Antarmuka",
+    "description": "Kenali pemilihan huruf, jarak, dan hierarki teks melalui contoh rancangan antarmuka.",
+    "category": "Design",
+    "level": "beginner",
+    "durationMinutes": 120,
+    "lessons": 10,
+    "accent": "lavender",
+    "icon": "Aa",
+    "languages": [
+      "id"
+    ],
+    "translations": {},
+    "progress": 30,
+    "minutesSpent": 40
+  },
+  {
+    "id": "7b810001-0000-4000-8000-000000000005",
+    "title": "Accessible Product Design",
+    "description": "Explore sample patterns for keyboard navigation, readable contrast, and inclusive interface states.",
+    "category": "Design",
+    "level": "intermediate",
+    "durationMinutes": 180,
+    "lessons": 14,
+    "accent": "blue",
+    "icon": "Aa",
+    "languages": [
+      "en"
+    ],
+    "translations": {},
+    "progress": 0,
+    "minutesSpent": 0
+  },
+  {
+    "id": "7b810001-0000-4000-8000-000000000006",
+    "title": "React State, Step by Step",
+    "description": "Explore sample state patterns, forms, and reusable components in a small React project.",
+    "category": "Development",
+    "level": "beginner",
+    "durationMinutes": 240,
+    "lessons": 16,
+    "accent": "peach",
+    "icon": "</>",
+    "languages": [
+      "id",
+      "en"
+    ],
+    "translations": {
+      "en": {
+        "title": "React State, Step by Step",
+        "description": "Explore sample state patterns, forms, and reusable components in a small React project."
+      },
+      "id": {
+        "title": "Memahami State React",
+        "description": "Jelajahi contoh pola state, formulir, dan komponen yang dapat digunakan ulang dalam proyek React kecil."
+      }
+    },
+    "progress": 55,
+    "minutesSpent": 80
+  },
+  {
+    "id": "7b810001-0000-4000-8000-000000000007",
+    "title": "Practical Database Foundations",
+    "description": "Explore example relational models, query boundaries, and indexing decisions for a learning application.",
+    "category": "Backend",
+    "level": "intermediate",
+    "durationMinutes": 180,
+    "lessons": 12,
+    "accent": "mint",
+    "icon": "DB",
+    "languages": [
+      "en"
+    ],
+    "translations": {},
+    "progress": 0,
+    "minutesSpent": 0
+  },
+  {
+    "id": "7b810001-0000-4000-8000-000000000008",
+    "title": "Membangun Formulir dengan React",
+    "description": "Latihan contoh formulir dengan validasi, status pemuatan, dan pesan kesalahan yang jelas.",
+    "category": "Development",
+    "level": "beginner",
+    "durationMinutes": 150,
+    "lessons": 11,
+    "accent": "peach",
+    "icon": "</>",
+    "languages": [
+      "id"
+    ],
+    "translations": {},
+    "progress": 0,
+    "minutesSpent": 0
+  },
+  {
+    "id": "7b810001-0000-4000-8000-000000000009",
+    "title": "Secure Sessions with NestJS",
+    "description": "Follow a sample browser-session flow with HttpOnly cookies, hashed identifiers, and server-side access checks.",
+    "category": "Backend",
+    "level": "intermediate",
+    "durationMinutes": 180,
+    "lessons": 13,
+    "accent": "blue",
+    "icon": "{ }",
+    "languages": [
+      "id",
+      "en"
+    ],
+    "translations": {
+      "en": {
+        "title": "Secure Sessions with NestJS",
+        "description": "Follow a sample browser-session flow with HttpOnly cookies, hashed identifiers, and server-side access checks."
+      },
+      "id": {
+        "title": "Sesi Aman dengan NestJS",
+        "description": "Ikuti contoh alur sesi browser dengan cookie HttpOnly, pengenal yang di-hash, dan pemeriksaan akses di server."
+      }
+    },
+    "progress": 12,
+    "minutesSpent": 20
+  }
+]

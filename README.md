@@ -155,3 +155,11 @@ Refresh rotation keeps the previously stored encrypted token pair until Supabase
 Run `node scripts/provision-demo.mjs` from this repository with the ignored server `.env` to provision the public demo. It creates a dedicated learner (`learner.demo@jakija.example` / `JakIja-Learn-Demo-2026!`), a separate instructor with a non-public random password, three fictional published course records, learner enrollments/progress, and a classroom welcome message. It verifies the learner role and enrollment count. Only these public learner credentials appear in the frontend.
 
 The provisioning script upserts fixed demo IDs and refuses to overwrite an existing account without the expected `showcase_demo` marker or a course owned by another profile. Re-running resets only the shared learner password and seeded sample rows. It does not delete database data. Public learner activity is shared; sample lessons are metadata demonstrating the interface, not a full curriculum. Keep this showcase separate from any future real learner data.
+
+## Course languages and expanded demo catalog
+
+The API exposes `languages` (`["id"]`, `["en"]`, or `["id","en"]`) and a `translations` object on both published-course and learner-dashboard responses. Course availability is independent of the interface language. `GET /api/courses?language=id`, `en`, or `both` selects the exact availability group, so a bilingual course appears in `both` rather than either language-only group. Invalid values return 400.
+
+Migration `20261022045142_course_languages.sql` adds the two fields without removing rows or changing existing access privileges. The demo seed reads `demo/courses.json` and provisions nine fictional course records: three Indonesian-only, three English-only, and three bilingual, with all nine enrolled in the shared learner account. Bilingual title/description copy is supplied for both supported languages. Full lesson materials remain outside this showcase.
+
+`npm run test:course-languages` verifies metadata, exact language filtering, and invalid-language rejection with synthetic HTTP responses.

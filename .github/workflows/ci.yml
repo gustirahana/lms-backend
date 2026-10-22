@@ -43,3 +43,6 @@ jobs:
 
       - name: Realtime smoke
         run: npm run test:realtime
+
+      - name: Course language smoke
+        run: npm run test:course-languages
