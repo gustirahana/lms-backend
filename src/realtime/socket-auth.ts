@@ -10,6 +10,9 @@ export function socketOptions(namespace: string) {
 
   return {
     namespace,
+    maxHttpBufferSize: 16384,
+    connectTimeout: 10000,
+    perMessageDeflate: false,
     cors: {
       origin: (origin, callback) => callback(null, Boolean(origin && origins.includes(origin))),
       credentials: true,
@@ -54,6 +57,7 @@ export function socketCookie(socket: Socket): string | undefined {
 }
 
 export function installSocketAuthentication(namespace: Namespace, authService: AuthService): void {
+  const attempts = new Map<string, { count: number; expiresAt: number }>();
   namespace.use((socket, next) => {
     void (async () => {
       try {
@@ -64,12 +68,42 @@ export function installSocketAuthentication(namespace: Namespace, authService: A
           throw new Error('Authentication required');
         }
 
+        const now = Date.now();
+        for (const [key, value] of attempts) {
+          if (value.expiresAt <= now) attempts.delete(key);
+        }
+        const attemptKey = authService.sessionHashForCookie(cookie);
+        let attempt = attempts.get(attemptKey);
+        if (!attempt) {
+          if (attempts.size >= 10000) throw new Error('Too many connections');
+          attempt = { count: 0, expiresAt: now + 60000 };
+          attempts.set(attemptKey, attempt);
+        }
+        if (++attempt.count > 30) throw new Error('Too many connections');
         const user = await authService.getAuthenticatedUser(cookie);
 
         if (!user) {
           throw new Error('Authentication required');
         }
 
+        const sessionHash = authService.sessionHashForCookie(cookie);
+        const sessionSockets = [...namespace.sockets.values()].filter(
+          (other) => other.data.sessionHash === sessionHash,
+        );
+        if (sessionSockets.length >= 6) throw new Error('Too many connections');
+        let count = 0;
+        let resetsAt = Date.now() + 10000;
+        socket.use((_packet, nextPacket) => {
+          const now = Date.now();
+          if (now >= resetsAt) { count = 0; resetsAt = now + 10000; }
+          count += 1;
+          if (count > 30) {
+            socket.disconnect(true);
+            nextPacket(new Error('Too many events'));
+            return;
+          }
+          nextPacket();
+        });
         socket.data.user = user;
         socket.data.sessionHash = authService.sessionHashForCookie(cookie);
         next();

@@ -163,3 +163,13 @@ The API exposes `languages` (`["id"]`, `["en"]`, or `["id","en"]`) and a `transl
 Migration `20261022045142_course_languages.sql` adds the two fields without removing rows or changing existing access privileges. The demo seed reads `demo/courses.json` and provisions nine fictional course records: three Indonesian-only, three English-only, and three bilingual, with all nine enrolled in the shared learner account. Bilingual title/description copy is supplied for both supported languages. Full lesson materials remain outside this showcase.
 
 `npm run test:course-languages` verifies metadata, exact language filtering, and invalid-language rejection with synthetic HTTP responses.
+
+## Public demo abuse controls
+
+HTTP requests have a per-client budget (default 120/minute), plus a 30/10-second burst cap. Login also has its own 10/15-minute cap, including route casing and trailing slash variants. Readiness checks are capped at 6/minute. Limits run before body parsing and return 429 with Retry-After. IPv6 clients are grouped by /56 subnet. Active buckets are never evicted to admit new clients; a full table rejects new clients until capacity expires.
+
+Socket.IO messages are capped at 16 KiB; each connection allows 30 events/10 seconds before disconnecting. Each session allows six connections per namespace and 30 authentication attempts/minute. Existing course membership checks and message limits still apply.
+
+These limits are in memory per process and reset on restart. Multiple instances need a shared limiter. They do not stop a distributed flood before it reaches Render. Put the API behind an edge/WAF with origin access restrictions for that protection. The Cloudflare Pages frontend has its own security headers; its hosting does not automatically protect the separate onrender.com API.
+
+Set TRUST_PROXY_HOPS only to the verified number of trusted proxies in your deployment. Never enable unrestricted trust or trust client-supplied forwarding headers directly. Incorrect proxy configuration can combine visitors into one rate-limit bucket or allow bypass. Keep FRONTEND_ORIGINS restricted to the exact frontend origin. No database changes are required for this update.

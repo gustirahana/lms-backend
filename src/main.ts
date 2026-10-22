@@ -13,11 +13,17 @@ async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule, { bodyParser: false });
 
   app.setGlobalPrefix('api');
+  app.getHttpAdapter().getInstance().disable('x-powered-by');
   app.getHttpAdapter().getInstance().set('trust proxy', config.trustProxyHops);
   app.use(securityHeaders(config.isProduction));
-  app.use(json({ limit: config.bodyLimit }));
-  app.use(urlencoded({ extended: false, limit: config.bodyLimit }));
-  app.use(originCheck(config.frontendOrigins));
+  app.enableCors({
+    origin: config.frontendOrigins,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-App-Name', 'X-App-Version', 'X-App-Device'],
+    credentials: true,
+    exposedHeaders: ['Retry-After', 'RateLimit-Limit', 'RateLimit-Remaining', 'RateLimit-Reset'],
+    maxAge: 600,
+  });
   app.use(
     new ApiRateLimitMiddleware(
       config.rateLimitMax,
@@ -26,13 +32,13 @@ async function bootstrap(): Promise<void> {
       config.authRateLimitWindowMs,
     ).use,
   );
-  app.enableCors({
-    origin: config.frontendOrigins,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-App-Name', 'X-App-Version', 'X-App-Device'],
-    credentials: true,
-    maxAge: 600,
-  });
+  app.use(originCheck(config.frontendOrigins));
+  app.use(json({ limit: config.bodyLimit, strict: true }));
+  app.use(urlencoded({ extended: false, limit: config.bodyLimit, parameterLimit: 50 }));
+  const server = app.getHttpServer();
+  server.headersTimeout = 15000;
+  server.requestTimeout = 30000;
+  server.maxRequestsPerSocket = 1000;
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
